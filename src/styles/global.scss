@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+:root {
+  --text-color: #355B3E;
+  --alt-text-color: #2F3D4C;
+
+  --main-bg-color: #fff;
+  --alt-bg-color: #F5DBC4;
+
+  --theme-color: #029664;
+
+  --border-color: #B8D6BF;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.visually-hidden:not(:focus):not(:active),
+input[type='checkbox'].visually-hidden,
+input[type='radio'].visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+  /* // -webkit-clip-path: inset(100%); */
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', 'Arial', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  color: var(--text-color);
+
+  margin: 0;
+  background-color: #fff;
+}
