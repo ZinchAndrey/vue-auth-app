@@ -4,18 +4,19 @@
     <div class="input__wrapper">
       <input
         class="input"
-        :type="type"
+        :type="currentType"
         :placeholder="placeholder"
-        :value="value"
         :name="name"
         v-model="modelValue"
         @input="updateValue"
+        @blur="blurField"
         :error="error">
 
       <button 
         class="button button--toggle-visibility" 
         type="button"
-        @mousedown.prevent="showPassword"
+        @mousedown.prevent="showField"
+        @mouseup.prevent="hideField"
         :hidden="type !== 'password'">
       </button>
     </div>
@@ -51,6 +52,7 @@ export default {
   data() {
     return {
       modelValue: '',
+      currentType: this.type,
     }
   },
   methods: {
@@ -60,7 +62,11 @@ export default {
     blurField(evt) {
       this.$emit('blur', evt);
     },
-    showPassword() {
+    showField() {
+      this.currentType = 'text';
+    },
+    hideField() {
+      this.currentType = this.type;
     }
   },
 }

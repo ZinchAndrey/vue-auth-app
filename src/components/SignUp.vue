@@ -15,29 +15,17 @@
 
       <form class="auth__form form">
         <!-- input block  -->
-        <base-input
-          class="form__input"
-          type="email"
-          label="Email"
-          placeholder="Email"
-          name="email"
-        />
+        <base-input class="form__input" type="email" label="Email" placeholder="Email" name="email" />
 
-        <base-input
-          class="form__input"
-          type="password"
-          label="Password"
-          placeholder="Password"
-          name="password"
-        />
+        <base-input class="form__input" type="password" label="Password" placeholder="Password" name="password" />
 
         <!-- button block  -->
         <div class="auth__buttons">
           <base-button mode="filled">
-          Login
+            Login
           </base-button>
           <base-button>
-          Sign Up
+            Sign Up
           </base-button>
         </div>
 
@@ -51,6 +39,36 @@
     </div>
   </div>
 </template>
+
+<script>
+import { useVuelidate } from '@vuelidate/core'
+import { required, email, minLength, helpers } from '@vuelidate/validators'
+
+export default {
+  setup() {
+    return { v$: useVuelidate() }
+  },
+  data() {
+    return {
+      email: '',
+      password: '',
+    }
+  },
+  validations() {
+    return {
+      email: {
+        required: helpers.withMessage('Enter your email', required),
+        email: helpers.withMessage('Incorrect email', email),
+        $lazy: true
+      },
+      password: {
+        required: helpers.withMessage('Enter your password', required),
+        minLength: helpers.withMessage('Minimal length is 4 symbols', minLength(4))
+      }
+    }
+  }
+}
+</script>
 
 <style lang="scss" scoped>
 .container {
@@ -102,7 +120,7 @@
 
 .form {}
 
-.form__input + .form__input {
+.form__input+.form__input {
   margin-top: 24px;
 }
 
