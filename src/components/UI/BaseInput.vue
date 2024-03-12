@@ -21,7 +21,7 @@
       </button>
     </div>
 
-    <span class="error">{{ error }}</span>
+    <span v-if="error && error.$message" class="error">{{ error.$message }}</span>
   </label>
 </template>
 
@@ -45,8 +45,8 @@ export default {
       default: ''
     },
     error: {
-      type: String,
-      default: ''
+      type: Object,
+      required: false
     },
   },
   data() {
@@ -108,18 +108,29 @@ export default {
   }
 
   .button {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
     background: #fff;
 
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    right: 16px;
+    right: 12px;
     cursor: pointer;
+    background: url('@/assets/visibility-icon.svg') no-repeat center;
+    transition: opacity ease-in 0.3s;
+  }
+
+  @media (hover: hover) {
+    .button:hover {
+      opacity: 0.8
+    }
   }
 
   .error {
+    font-size: 13px;
     font-weight: 400;
     color: rgb(217, 55, 55);
     position: absolute;
