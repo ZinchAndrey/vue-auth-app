@@ -1,6 +1,5 @@
 <template>
-  <the-loader v-if="isLoading" />
-  <div v-else class="container">
+  <div class="container">
     <div class="auth">
       <div class="auth__logo">
         <img class="auth__icon" src="@/assets/logo.svg" alt="">
@@ -17,27 +16,27 @@
       <form class="auth__form form" @submit.prevent="submitForm">
 
         <!-- input block  -->
-        <base-input class="form__input" type="email" label="Email" placeholder="Email" name="email" :value="email"
+        <base-input class="form__input" type="email" label="Email" placeholder="Email" name="email"
           :error="v$.$errors.find(item => item.$property === 'email')" @update:modelValue="updateFieldValue"
           @blur="validateField" />
 
-        <base-input class="form__input" type="password" label="Password" placeholder="Password" name="password" :value="password"
+        <base-input class="form__input" type="password" label="Password" placeholder="Password" name="password"
           :error="v$.$errors.find(item => item.$property === 'password')" @update:modelValue="updateFieldValue"
           @blur="validateField" />
 
-        <base-input v-if="currentFormType === 'sign-up'" class="form__input" type="password" label="Confirm password" :value="confirmedPassword"
+        <base-input v-if="currentFormType === 'sign-up'" class="form__input" type="password" label="Confirm password"
           placeholder="Password" name="confirmedPassword"
           :error="v$.$errors.find(item => item.$property === 'confirmedPassword')" @update:modelValue="updateFieldValue"
           @blur="validateField" />
 
         <!-- button block  -->
         <div class="auth__buttons">
-          <base-button :mode="isLoginMode ? 'filled' : ''" :type="isLoginMode ? 'submit' : 'button'"
-            @click.prevent="login">
+          <base-button :mode="currentFormType === 'login' ? 'filled' : ''"
+            :type="currentFormType === 'login' ? 'submit' : 'button'" @click.prevent="login">
             Login
           </base-button>
-          <base-button :mode="!isLoginMode ? 'filled' : ''" :type="!isLoginMode ? 'submit' : 'button'"
-            @click.prevent="signUp">
+          <base-button :mode="currentFormType === 'sign-up' ? 'filled' : ''"
+            :type="currentFormType === 'sign-up' ? 'submit' : 'button'" @click.prevent="signUp">
             Sign Up
           </base-button>
         </div>
@@ -57,33 +56,23 @@
 import { useVuelidate } from '@vuelidate/core'
 import { required, email, minLength, helpers, sameAs } from '@vuelidate/validators'
 
-import { SIGN_UP_ENDPOINT, SIGN_IN_ENDPOINT } from '@/utils.js'
-
-import TheLoader from './UI/TheLoader.vue'
+import { SIGN_UP_ENDPOINT } from '@/utils'
 
 export default {
   setup() {
     return { v$: useVuelidate() }
-  },
-  components: {
-    TheLoader
   },
   data() {
     return {
       email: '',
       password: '',
       confirmedPassword: '',
-      currentFormType: 'login',
-      isLoading: false,
-      fetchError: null,
+      currentFormType: 'login'
     }
   },
   computed: {
     isValid() {
       return !this.v$.$invalid;
-    },
-    isLoginMode() {
-      return this.currentFormType === 'login';
     }
   },
   methods: {
@@ -103,8 +92,7 @@ export default {
     },
     // TO DO - login и sugn-up можно как-нибудь объединить 
     login() {
-      console.log('test');
-      if (!this.isLoginMode) {
+      if (this.currentFormType === 'sign-up') {
         this.toggleCurrentFormType();
         return;
       }
@@ -112,7 +100,7 @@ export default {
       this.submitForm();
     },
     signUp() {
-      if (this.isLoginMode) {
+      if (this.currentFormType === 'login') {
         this.toggleCurrentFormType();
         return;
       }
@@ -122,52 +110,30 @@ export default {
     fetchData(data) {
       data.returnSecureToken = true;
 
-      this.isLoading = true;
-
-      fetch(this.isLoginMode ? SIGN_IN_ENDPOINT : SIGN_UP_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }).then(response => {
-        console.log(response);
-        if (response.ok) {
-          return response.json();
-        }
-      }).then(data => {
-        console.log(data);
-        // если такая почта уже есть, нужно в компонент email кидать эту ошибку 
-        const { idToken, expiresIn, localId } = { data };
-        // const userToken = data.idToken;
-        // const userToken = data.idToken;
-        // {
-        //   "kind": "identitytoolkit#SignupNewUserResponse",
-        //     "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwOWY4ZTMzN2ZjNzg1NTE0ZTExMGM2ZDg0N2Y0M2M3NDM1M2U0YWYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdnVlLWF1dGgtYXBwLTkzNjZjIiwiYXVkIjoidnVlLWF1dGgtYXBwLTkzNjZjIiwiYXV0aF90aW1lIjoxNzEwNjAyNzkxLCJ1c2VyX2lkIjoiMWdVY1d2QmV4ZFM4N0lBaXdycEdSeWxtOHNFMyIsInN1YiI6IjFnVWNXdkJleGRTODdJQWl3cnBHUnlsbThzRTMiLCJpYXQiOjE3MTA2MDI3OTEsImV4cCI6MTcxMDYwNjM5MSwiZW1haWwiOiJ0ZXN0MUBtYWlsLnJ1IiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbInRlc3QxQG1haWwucnUiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.V_oM8FA0o_CUkRdGYzRtIWBqU7FEfghi4FZ0gffPxIqu-tIGLiSu6qiYM76EEPfC4KVna6xa31eYl7FA40nUve8lqp62Z9U-tUO2AXy7EyiLYASkG_wE_eUCrnhZ-c92EPQxmm22gBvAdyCRjzIPAT2HP6RroMAWcLH9L_34OAculJtacC1fy7tRMI_lDbcp0DRZYrJtVx51zGQ3fRd6vT8ZWks0-A-HHHBpy7nUghG9YpJJTG7h0TdqnbCykJBRSuVrO_khqaVoJhgylfpP5_w2hw7DG0elhaPlp79YqypFKIyYByXTeC8qIu4zEpjdO5hbvlAc7bsRuzNPwkmaEw",
-        //       "email": "test1@mail.ru",
-        //         "refreshToken": "AMf-vByLYBOiaDdU7pHAI2Z7Rkn9ROWSnF8_VA-0TUL_Uk4P8-3Wv8GKLBSiuU9PXkI5G-9baLEz5SXJpPx_Di6MtdYvHLno3SLPbbqkRzPlYkOo0SaluylBRDFLKg9aozFdjqNM-1CHvBVvV3ut0DXG1NtQIpCObSbM6Qo2xQmSDbdUX47EAhhxaR5cKexXXKG_gD6oqZO7ibpEJR9QJQt1sTCJ5cay3w",
-        //           "expiresIn": "3600",
-        //             "localId": "1gUcWvBexdS87IAiwrpGRylm8sE3"
-        // }
-
-        this.isLoading = false;
-      });
+      fetch(`${SIGN_UP_ENDPOINT}/users.json`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
     },
     submitForm() {
       this.v$.$touch();
 
-      console.log(this.v$);
       if (!this.isValid) {
         return;
       }
 
-      const data = {
+      const userData = {
         email: this.email,
-        password: this.password,
+        password: this.password
       }
 
-      this.fetchData(data);
-      console.log('Send data');
+      this.fetchData(userData);
+
+      console.log('Sended data', userData);
     }
   },
   validations() {
@@ -179,15 +145,16 @@ export default {
       },
       password: {
         required: helpers.withMessage('Enter your password', required),
-        minLength: helpers.withMessage('Minimal length is 8 symbols', minLength(8))
+        minLength: helpers.withMessage('Minimal length is 4 symbols', minLength(4))
       },
       confirmedPassword: {
-        sameAsPassword: this.isLoginMode ? '' : helpers.withMessage('Password mismatch', sameAs(this.password))
+        sameAsPassword: helpers.withMessage('Password mismatch', sameAs(this.password))
       }
     }
   }
 }
 </script>
+
 
 <style lang="scss" scoped>
 .container {
@@ -223,8 +190,6 @@ export default {
   margin-bottom: 55px
 }
 
-.auth__icon {}
-
 .auth__caption {
   font-size: 24px;
   line-height: 150%;
@@ -232,12 +197,6 @@ export default {
 
   margin: 0 0 16px;
 }
-
-.auth__sub {}
-
-.auth__form {}
-
-.form {}
 
 .form__input+.form__input {
   margin-top: 24px;

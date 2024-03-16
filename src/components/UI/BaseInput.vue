@@ -32,6 +32,10 @@ export default {
       type: String,
       default: 'text'
     },
+    value: {
+      type: String,
+      default: ''
+    },
     label: {
       type: String,
       default: ''
@@ -51,7 +55,7 @@ export default {
   },
   data() {
     return {
-      modelValue: '',
+      modelValue: this.value,
       currentType: this.type,
     }
   },
