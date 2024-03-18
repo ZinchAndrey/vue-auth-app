@@ -76,6 +76,7 @@ export default {
       currentFormType: 'login',
       isLoading: false,
       fetchError: null,
+      authData: {},
     }
   },
   computed: {
@@ -103,7 +104,6 @@ export default {
     },
     // TO DO - login и sugn-up можно как-нибудь объединить 
     login() {
-      console.log('test');
       if (!this.isLoginMode) {
         this.toggleCurrentFormType();
         return;
@@ -138,17 +138,9 @@ export default {
       }).then(data => {
         console.log(data);
         // если такая почта уже есть, нужно в компонент email кидать эту ошибку 
-        const { idToken, expiresIn, localId } = { data };
-        // const userToken = data.idToken;
-        // const userToken = data.idToken;
-        // {
-        //   "kind": "identitytoolkit#SignupNewUserResponse",
-        //     "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjYwOWY4ZTMzN2ZjNzg1NTE0ZTExMGM2ZDg0N2Y0M2M3NDM1M2U0YWYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vdnVlLWF1dGgtYXBwLTkzNjZjIiwiYXVkIjoidnVlLWF1dGgtYXBwLTkzNjZjIiwiYXV0aF90aW1lIjoxNzEwNjAyNzkxLCJ1c2VyX2lkIjoiMWdVY1d2QmV4ZFM4N0lBaXdycEdSeWxtOHNFMyIsInN1YiI6IjFnVWNXdkJleGRTODdJQWl3cnBHUnlsbThzRTMiLCJpYXQiOjE3MTA2MDI3OTEsImV4cCI6MTcxMDYwNjM5MSwiZW1haWwiOiJ0ZXN0MUBtYWlsLnJ1IiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbInRlc3QxQG1haWwucnUiXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.V_oM8FA0o_CUkRdGYzRtIWBqU7FEfghi4FZ0gffPxIqu-tIGLiSu6qiYM76EEPfC4KVna6xa31eYl7FA40nUve8lqp62Z9U-tUO2AXy7EyiLYASkG_wE_eUCrnhZ-c92EPQxmm22gBvAdyCRjzIPAT2HP6RroMAWcLH9L_34OAculJtacC1fy7tRMI_lDbcp0DRZYrJtVx51zGQ3fRd6vT8ZWks0-A-HHHBpy7nUghG9YpJJTG7h0TdqnbCykJBRSuVrO_khqaVoJhgylfpP5_w2hw7DG0elhaPlp79YqypFKIyYByXTeC8qIu4zEpjdO5hbvlAc7bsRuzNPwkmaEw",
-        //       "email": "test1@mail.ru",
-        //         "refreshToken": "AMf-vByLYBOiaDdU7pHAI2Z7Rkn9ROWSnF8_VA-0TUL_Uk4P8-3Wv8GKLBSiuU9PXkI5G-9baLEz5SXJpPx_Di6MtdYvHLno3SLPbbqkRzPlYkOo0SaluylBRDFLKg9aozFdjqNM-1CHvBVvV3ut0DXG1NtQIpCObSbM6Qo2xQmSDbdUX47EAhhxaR5cKexXXKG_gD6oqZO7ibpEJR9QJQt1sTCJ5cay3w",
-        //           "expiresIn": "3600",
-        //             "localId": "1gUcWvBexdS87IAiwrpGRylm8sE3"
-        // }
+        const { idToken, expiresIn, localId } = data;
+        this.authData =  { idToken, expiresIn, localId };
+        console.log(this.authData);
 
         this.isLoading = false;
       });
@@ -197,7 +189,7 @@ export default {
   display: flex;
   align-items: stretch;
 
-  width: 1300px;
+  width: fit-content;
   margin: 0 auto;
   border-radius: 24px;
   overflow: hidden;
@@ -223,8 +215,6 @@ export default {
   margin-bottom: 55px
 }
 
-.auth__icon {}
-
 .auth__caption {
   font-size: 24px;
   line-height: 150%;
@@ -233,11 +223,9 @@ export default {
   margin: 0 0 16px;
 }
 
-.auth__sub {}
-
-.auth__form {}
-
-.form {}
+.auth__sub {
+  margin: 0 0 15px;
+}
 
 .form__input+.form__input {
   margin-top: 24px;
@@ -252,7 +240,43 @@ export default {
 }
 
 .decoration {
-  width: 746px;
+  width: 640px;
   background: #F5DBC4 url('@/assets/decoration-image.svg') no-repeat center;
+}
+
+@media (max-width: 1200px) {
+  .auth {
+    padding: 30px 40px;
+    width: 450px;
+  }
+
+  .auth__logo {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+
+  .auth__caption {
+    font-size: 20px;
+    line-height: 120%;
+  }
+
+  .auth__buttons button {
+    min-width: 150px;
+  }
+
+  .decoration {
+    width: 450px;
+    background-size: 80% auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  .auth__caption {
+    font-size: 18px;
+  }
+
+  .decoration {
+    display: none;
+  }
 }
 </style>

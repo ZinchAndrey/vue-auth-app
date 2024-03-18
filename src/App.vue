@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <main>
     <sign-up></sign-up>
-  </div>
+  </main>
 </template>
 
 <script>
@@ -15,4 +15,15 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--container-bg-color);
+
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+}
+</style>
