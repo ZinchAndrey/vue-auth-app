@@ -1,17 +1,13 @@
 <template>
   <main>
-    <sign-up></sign-up>
+    <router-view/>
   </main>
 </template>
 
 <script>
-// import { RouterLink, RouterView } from 'vue-router'
-import SignUp from '@/components/SignUp.vue';
 
 export default {
-  components: {
-    SignUp,
-  }
+
 }
 </script>
 

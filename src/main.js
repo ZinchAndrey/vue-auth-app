@@ -2,6 +2,8 @@ import '@/styles/global.scss';
 
 import { createApp } from 'vue'
 
+import router from '@/router/index.js'
+
 import BaseButton from '@/components/UI/BaseButton.vue';
 import BaseInput from '@/components/UI/BaseInput.vue';
 import TheLoader from '@/components/UI/TheLoader.vue';
@@ -15,6 +17,5 @@ app.component('base-input', BaseInput);
 app.component('the-loader', TheLoader);
 
 
-// app.use(router)
-
+app.use(router)
 app.mount('#app')
