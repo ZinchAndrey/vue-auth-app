@@ -21,12 +21,12 @@
           :error="v$.$errors.find(item => item.$property === 'email')" @update:modelValue="updateFieldValue"
           @blur="validateField" />
 
-        <base-input class="form__input" type="password" label="Password" placeholder="Password" name="password" :value="password"
-          :error="v$.$errors.find(item => item.$property === 'password')" @update:modelValue="updateFieldValue"
-          @blur="validateField" />
+        <base-input class="form__input" type="password" label="Password" placeholder="Password" name="password"
+          :value="password" :error="v$.$errors.find(item => item.$property === 'password')"
+          @update:modelValue="updateFieldValue" @blur="validateField" />
 
-        <base-input v-if="currentFormType === 'sign-up'" class="form__input" type="password" label="Confirm password" :value="confirmedPassword"
-          placeholder="Password" name="confirmedPassword"
+        <base-input v-if="currentFormType === 'sign-up'" class="form__input" type="password" label="Confirm password"
+          :value="confirmedPassword" placeholder="Password" name="confirmedPassword"
           :error="v$.$errors.find(item => item.$property === 'confirmedPassword')" @update:modelValue="updateFieldValue"
           @blur="validateField" />
 
@@ -139,16 +139,19 @@ export default {
         console.log(data);
         // если такая почта уже есть, нужно в компонент email кидать эту ошибку 
         const { idToken, expiresIn, localId } = data;
-        this.authData =  { idToken, expiresIn, localId };
+        this.authData = { idToken, expiresIn, localId };
         console.log(this.authData);
 
+        sessionStorage.setItem('userId', localId);
+        sessionStorage.setItem('token', idToken);
+
         this.isLoading = false;
+        this.redirectToCountriesList();
       });
     },
     submitForm() {
       this.v$.$touch();
 
-      console.log(this.v$);
       if (!this.isValid) {
         return;
       }
@@ -160,6 +163,9 @@ export default {
 
       this.fetchData(data);
       console.log('Send data');
+    },
+    redirectToCountriesList() {
+      this.$router.push('/countries');
     }
   },
   validations() {

@@ -9,24 +9,28 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      // redirect: '/signup'
-      redirect: '/countries'
+      redirect: '/signup'
+      // redirect: '/countries'
     },
     {
       path: '/signup',
-      // name: 'about',
       component: SignUp
     },
     {
       path: '/countries',
-      // name: 'about',
       component: CountriesList
     },
     {
       path: '/countries/:countryKey',
       component: CountryDetail
     }
-  ]
+  ],
+  scrollBehavior(_to, _from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition; // если тыкнули назад - то вернемся в то же положение на странице
+    }
+    return { top: 0, left: 0 }
+  }
 })
 
 export default router
