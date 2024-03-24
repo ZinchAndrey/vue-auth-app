@@ -3,14 +3,13 @@
       <p>{{ error }}</p>
     </base-dialog> -->
 
-  <!-- filter  -->
   <div v-if="isLoading">
     <the-loader />
     <!-- <base-spinner></base-spinner> -->
   </div>
   <div v-else-if="countriesWasLoaded" class="countries__wrapper">
-    <h1 class="coutnries__header">
-      Select the country you want to travel to
+    <h1 class="countries__header">
+      Here you can read the info about countries you want visit to
     </h1>
     <ul class="countries__list">
       <li v-for="country in countries" :key="country.name">
@@ -37,12 +36,8 @@ export default {
     };
   },
   computed: {
-    // countries() {
-    //   // return this.$store.getters.countries.slice(0, 100) || [];
-    //   return this.$store.getters.countries || [];
-    // },
     countriesWasLoaded() {
-      return this.countries.length;
+      return !!this.countries.length;
     },
   },
   methods: {
@@ -75,6 +70,7 @@ export default {
 
       // this.countries = countries;
       this.countries = countries.slice(0, 10);
+      window.countries = countries.slice(0, 10);
     },
     async loadCountries() {
 
@@ -93,10 +89,9 @@ export default {
     },
   },
   created() {
-    this.loadCountries();
-    // if (!this.countriesWasLoaded) {
-    //   this.loadCountries();
-    // }
+    if (!this.countriesWasLoaded) {
+      this.loadCountries();
+    }
   },
 };
 </script>
@@ -118,13 +113,14 @@ export default {
   width: 100%;
 }
 
-.coutnries__header {
+.countries__header {
   font-size: 28px;
   line-height: 120%;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--white-color);
 
   text-align: center;
+  margin: 0 auto 20px;
 }
 
 .message {

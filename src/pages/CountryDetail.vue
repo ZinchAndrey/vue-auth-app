@@ -1,0 +1,319 @@
+<template>
+  <!-- РАЗОБРАТЬСЯ С ЭТИМ КОМПОНЕНТОМ -->
+  <base-container>
+    <div v-if="!countriesLoaded">
+      <the-loader />
+      <!-- <base-spinner></base-spinner> -->
+    </div>
+    <div v-else>
+      <header class="country__header">
+        <base-button class="btn--back" @click="goBack">Back</base-button>
+      </header>
+      <section class="country">
+        <img :src="country.flagSrc" alt="" class="country__flag" />
+        <div class="country__content">
+          <h2 class="country__caption">
+            {{ country.name }}
+          </h2>
+          <ul class="country__description-list">
+            <li class="country__description-item" v-if="country.nativeName">
+              <b>Native Name:</b> {{ country.nativeName }}
+            </li>
+            <li class="country__description-item" v-if="population">
+              <b>Population:</b> {{ population }}
+            </li>
+            <li class="country__description-item" v-if="country.region">
+              <b>Region:</b> {{ country.region }}
+            </li>
+            <li class="country__description-item" v-if="country.subRegion">
+              <b>Sub Region:</b> {{ country.subRegion }}
+            </li>
+            <li class="country__description-item" v-if="country.capital">
+              <b>Capital:</b> {{ country.capital }}
+            </li>
+            <li class="country__description-item" v-if="topLevelDomain">
+              <b>Top Level Domain:</b> {{ topLevelDomain }}
+            </li>
+            <li class="country__description-item" v-if="currencies">
+              <b>Currencies:</b> {{ currencies }}
+            </li>
+            <li class="country__description-item" v-if="languages">
+              <b>Languages:</b> {{ languages }}
+            </li>
+          </ul>
+          <div class="country__borders-block" v-if="hasBorderCountries">
+            <b>Border Countries:</b>
+            <ul class="country__borders-list">
+              <li class="" v-for="borderCountry in country.borderCountries" :key="borderCountry.key">
+                <base-plate>
+                  {{ borderCountry }}
+                </base-plate>
+              </li>
+            </ul>
+          </div>
+          <p v-else><b>No border countries.</b></p>
+        </div>
+      </section>
+    </div>
+  </base-container>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      isLoading: false,
+      countries: [],
+      currentCountry: {}
+    };
+  },
+  computed: {
+    languages() {
+      let languages = "";
+      this.country.languages.forEach(
+        (language) => (languages += language.name + ", ")
+      );
+      return languages.slice(0, -2);
+    },
+    countryKey() {
+      return this.$route.params.countryKey;
+    },
+    countriesLoaded() {
+      return !this.isLoading && ((!!this.countries && !!this.countries.length) || !!this.currentCountry)
+    },
+    country() {
+      return this.countries && this.countries.length > 0 ? this.countries.find((country) => country.key === this.countryKey) : this.currentCountry;
+    },
+    population() {
+      return this.country.population
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
+    currencies() {
+      let currenciesStr = "";
+      this.country.currencies &&
+        this.country.currencies.forEach(
+          (currency) => (currenciesStr += currency.name + ", ")
+        );
+      return currenciesStr.slice(0, -2);
+    },
+    topLevelDomain() {
+      const topLevelDomains = this.country.topLevelDomain.reduce(
+        (prev, current) => {
+          return prev + current + ", ";
+        },
+        ""
+      );
+      return topLevelDomains.slice(0, -2);
+    },
+    hasBorderCountries() {
+      return (
+        !!this.country.borderCountries && !!this.country.borderCountries.length
+      );
+    },
+  },
+  methods: {
+    goBack() {
+      this.$router.back();
+    },
+    async loadCurrentCountry(countryName) {
+      this.isLoading = true;
+
+      try {
+        const response = await fetch(`https://restcountries.com/v2/name/${countryName}`);
+        const responseData = await response.json();
+
+        const loadedCountry = responseData[0];
+        const currentCountry = {
+          name: loadedCountry.name,
+          population: loadedCountry.population,
+          capital: loadedCountry.capital,
+          nativeName: loadedCountry.nativeName,
+          region: loadedCountry.region,
+          subRegion: loadedCountry.subregion,
+          languages: loadedCountry.languages,
+          currencies: loadedCountry.currencies,
+          borderCountries: loadedCountry.borders,
+          flagSrc: loadedCountry.flag,
+          topLevelDomain: loadedCountry.topLevelDomain,
+          key: loadedCountry.name,
+        }
+
+        this.currentCountry = currentCountry;
+
+        // context.commit('setCurrentCountry', currentCountry);
+        // КУДА-ТО НАДО СОХРАНИТЬ 
+      } catch (error) {
+        console.log(error);
+        this.error = error.message || "Sorry, we have an error";
+      }
+
+      this.isLoading = false;
+    },
+  },
+  created() {
+    this.countries = window.countries;
+    if (!this.countries || !this.countries.length) {
+      this.loadCurrentCountry(this.countryKey);
+    }
+  },
+};
+</script>
+
+<style scoped>
+.country__header {
+  padding: 30px 0;
+}
+
+.dark-theme .btn--back::before {
+  background: url("../../assets/countries/arrow-left.svg") no-repeat center;
+}
+
+.country {
+  font-size: 16px;
+  line-height: 32px;
+  color: var(--white-color);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.country__flag {
+  width: 560px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.country__content {
+  flex-grow: 1;
+  max-width: 600px;
+}
+
+.country__caption {
+  font-weight: 800;
+  font-size: 32px;
+  line-height: 44px;
+  margin: 0 0 23px;
+}
+
+.country__description-list {
+  padding: 0;
+  margin: 0 0 68px;
+  list-style: none;
+
+  width: 100%;
+  display: grid;
+  grid-template-rows: repeat(5, auto);
+  grid-template-columns: 50% 50%;
+  grid-auto-flow: column;
+  column-gap: 10px;
+}
+
+.country__description-item {}
+
+.country__borders-block {
+  display: flex;
+  align-items: center;
+}
+
+.country__borders-list {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 10px;
+  justify-content: end;
+  align-content: center;
+  /* justify-items: stretch; */
+  margin: 0 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.country__borders-item {}
+
+.country__borders-item {
+  font-family: inherit;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 19px;
+  color: inherit;
+
+  background: var(--alt-bg-color);
+  box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.23);
+  border-radius: 6px;
+  border: none;
+  padding: 5px 10px;
+  min-width: 96px;
+
+  text-align: center;
+
+  transition: all ease-in 0.1s;
+  cursor: pointer;
+}
+
+.country__borders-item:hover {
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 1280px) {
+  .country {
+    justify-content: space-around;
+  }
+
+  .country__content {
+    max-width: 400px;
+  }
+
+  .country__description-list {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 1100px) {
+  .country__header {
+    padding: 40px 0;
+  }
+
+  .country {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 25px 0;
+  }
+
+  .country__caption {
+    margin-bottom: 16px;
+  }
+
+  .country__flag {
+    margin: 0 0 44px;
+  }
+
+  .country__content {
+    align-self: flex-start;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .country__description-list {
+    margin-bottom: 32px;
+  }
+
+  .country__borders-block {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .country__borders-list {
+    width: 100%;
+    margin: 16px 0 0;
+    justify-content: stretch;
+    align-items: center;
+  }
+}
+</style>
