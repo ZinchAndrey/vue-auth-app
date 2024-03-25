@@ -118,33 +118,41 @@ export default {
 
       this.submitForm();
     },
-    fetchData(data) {
+    async fetchData(data) {
       data.returnSecureToken = true;
-
       this.isLoading = true;
 
-      fetch(this.isLoginMode ? SIGN_IN_ENDPOINT : SIGN_UP_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      }).then(response => {
-        console.log(response);
-        if (response.ok) {
-          return response.json();
+      try {
+        const response = await fetch(this.isLoginMode ? SIGN_IN_ENDPOINT : SIGN_UP_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const responseData = await response.json();
+
+        if (!response.ok) {
+          console.log(responseData);
+          throw new Error(responseData.error.message || 'An error has occurred');
+
+        } else {
+          // если такая почта уже есть, нужно в компонент email кидать эту ошибку 
+          const { idToken, expiresIn, localId } = responseData;
+          this.authData = { idToken, expiresIn, localId };
+
+          sessionStorage.setItem('userId', localId);
+          sessionStorage.setItem('token', idToken);
+
+          this.isLoading = false;
+          this.redirectToCountriesList();
         }
-      }).then(data => {
-        // если такая почта уже есть, нужно в компонент email кидать эту ошибку 
-        const { idToken, expiresIn, localId } = data;
-        this.authData = { idToken, expiresIn, localId };
+      } catch (error) {
+        console.log(error);
+      }
 
-        sessionStorage.setItem('userId', localId);
-        sessionStorage.setItem('token', idToken);
 
-        this.isLoading = false;
-        this.redirectToCountriesList();
-      });
     },
     submitForm() {
       this.v$.$touch();
