@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import SignUp from '@/components/SignUp.vue'
+import SignUp from '@/pages/SignUp.vue'
 import CountriesList from '@/pages/CountriesList.vue'
 import CountryDetail from '@/pages/CountryDetail.vue'
 
@@ -9,28 +9,47 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'index',
       redirect: '/signup'
-      // redirect: '/countries'
     },
     {
       path: '/signup',
+      name: 'signup',
       component: SignUp
     },
     {
       path: '/countries',
-      component: CountriesList
+      name: 'countries',
+      component: CountriesList,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/countries/:countryKey',
-      component: CountryDetail
+      name: 'country',
+      component: CountryDetail,
+      meta: {
+        requiresAuth: true
+      }
     }
   ],
   scrollBehavior(_to, _from, savedPosition) {
     if (savedPosition) {
-      return savedPosition; // если тыкнули назад - то вернемся в то же положение на странице
+      return savedPosition // если тыкнули назад - то вернемся в то же положение на странице
     }
     return { top: 0, left: 0 }
   }
+})
+
+router.beforeEach((to) => {
+  const isUserAuth = sessionStorage.getItem('userId') && sessionStorage.getItem('token')
+
+  if (to.meta.requiresAuth && !isUserAuth) {
+    return { name: 'signup' }
+  }
+
+  return true
 })
 
 export default router

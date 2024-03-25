@@ -59,7 +59,7 @@ import { required, email, minLength, helpers, sameAs } from '@vuelidate/validato
 
 import { SIGN_UP_ENDPOINT, SIGN_IN_ENDPOINT } from '@/utils.js'
 
-import TheLoader from './UI/TheLoader.vue'
+import TheLoader from '@/components/UI/TheLoader.vue'
 
 export default {
   setup() {
@@ -93,7 +93,6 @@ export default {
     },
     validateField(evt) {
       this.v$[evt.target.name] && this.v$[evt.target.name].$touch();
-      // console.log(this.v$);
     },
     toggleCurrentFormType() {
       if (this.currentFormType === 'login') {
@@ -136,11 +135,9 @@ export default {
           return response.json();
         }
       }).then(data => {
-        console.log(data);
         // если такая почта уже есть, нужно в компонент email кидать эту ошибку 
         const { idToken, expiresIn, localId } = data;
         this.authData = { idToken, expiresIn, localId };
-        console.log(this.authData);
 
         sessionStorage.setItem('userId', localId);
         sessionStorage.setItem('token', idToken);
@@ -162,7 +159,6 @@ export default {
       }
 
       this.fetchData(data);
-      console.log('Send data');
     },
     redirectToCountriesList() {
       this.$router.push('/countries');
