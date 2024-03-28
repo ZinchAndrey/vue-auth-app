@@ -68,9 +68,10 @@ export default {
         countries.push(filteredCountryData);
       });
 
-      // this.countries = countries;
-      this.countries = countries.slice(0, 10);
-      window.countries = countries.slice(0, 10);
+      this.countries = countries;
+      window.countries = countries;
+      // this.countries = countries.slice(0, 10);
+      // window.countries = countries.slice(0, 10);
     },
     async loadCountries() {
 

@@ -10,7 +10,14 @@ const router = createRouter({
     {
       path: '/',
       name: 'index',
-      redirect: '/signup'
+      redirect: () => {
+        const isUserAuth = sessionStorage.getItem('userId') && sessionStorage.getItem('token')
+
+        if (isUserAuth) {
+          return '/countries'
+        }
+        return '/signup'
+      } 
     },
     {
       path: '/signup',

@@ -54,8 +54,6 @@
 
 
     <div class="decoration">
-      <!-- эмблема машинки -->
-
     </div>
   </div>
 </template>
@@ -109,7 +107,7 @@ export default {
         this.fetchError = 'Incorrect login and password data'
       } else if (errorMessage === 'EMAIL_EXISTS') {
         this.fetchError = 'This email already exists'
-      } else if (errorMessage === 'TOO_MANY_ATTEMPTS_TRY_LATER') {
+      } else if (errorMessage.includes('TOO_MANY_ATTEMPTS_TRY_LATER')) {
         this.fetchError = 'Too many attempts, try again later'
       } else {
         this.fetchError = 'An error has occurred'
@@ -160,6 +158,7 @@ export default {
         } else {
           const { idToken, expiresIn, localId } = responseData;
           this.authData = { idToken, expiresIn, localId };
+          console.log(responseData);
 
           sessionStorage.setItem('userId', localId);
           sessionStorage.setItem('token', idToken);

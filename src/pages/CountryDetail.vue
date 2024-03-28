@@ -1,9 +1,7 @@
 <template>
-  <!-- РАЗОБРАТЬСЯ С ЭТИМ КОМПОНЕНТОМ -->
   <base-container>
     <div v-if="!countriesLoaded">
       <the-loader />
-      <!-- <base-spinner></base-spinner> -->
     </div>
     <div v-else>
       <header class="country__header">
@@ -140,9 +138,6 @@ export default {
         }
 
         this.currentCountry = currentCountry;
-
-        // context.commit('setCurrentCountry', currentCountry);
-        // КУДА-ТО НАДО СОХРАНИТЬ 
       } catch (error) {
         console.log(error);
         this.error = error.message || "Sorry, we have an error";
