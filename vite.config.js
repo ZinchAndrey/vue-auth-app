@@ -6,18 +6,22 @@ import svgLoader from 'vite-svg-loader'
 
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  base: '/vue-auth-app/',
+export default ({ mode }) => {
+  const isProduction = mode === 'production'
 
-  plugins: [
-    vue(),
-    svgLoader({
-      defaultImport: 'url' // or 'raw'
-    })
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+  return defineConfig({
+    base: isProduction ? '/'  : '/vue-auth-app/',
+  
+    plugins: [
+      vue(),
+      svgLoader({
+        defaultImport: 'url' // or 'raw'
+      })
+    ],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      }
     }
-  }
-})
+  })
+}
