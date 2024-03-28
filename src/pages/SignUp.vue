@@ -1,4 +1,11 @@
 <template>
+  <base-dialog v-if="!!fetchError" 
+    :show="true" 
+    title="Error"
+    @close="clearFetchError">
+  {{ fetchError }}
+  </base-dialog>
+
   <the-loader v-if="isLoading" />
   <div v-else class="container">
     <div class="auth">
@@ -85,7 +92,7 @@ export default {
     },
     isLoginMode() {
       return this.currentFormType === 'login';
-    }
+    },
   },
   methods: {
     updateFieldValue(value, field) {
@@ -94,6 +101,20 @@ export default {
     validateField(evt) {
       this.v$[evt.target.name] && this.v$[evt.target.name].$touch();
     },
+    clearFetchError() {
+      this.fetchError = null;
+    },
+    handleFetchError(errorMessage) {
+      if (errorMessage === 'INVALID_LOGIN_CREDENTIALS') {
+        this.fetchError = 'Incorrect login and password data'
+      } else if (errorMessage === 'EMAIL_EXISTS') {
+        this.fetchError = 'This email already exists'
+      } else if (errorMessage === 'TOO_MANY_ATTEMPTS_TRY_LATER') {
+        this.fetchError = 'Too many attempts, try again later'
+      } else {
+        this.fetchError = 'An error has occurred'
+      }
+    },
     toggleCurrentFormType() {
       if (this.currentFormType === 'login') {
         this.currentFormType = 'sign-up';
@@ -101,7 +122,6 @@ export default {
         this.currentFormType = 'login'
       }
     },
-    // TO DO - login и sugn-up можно как-нибудь объединить 
     login() {
       if (!this.isLoginMode) {
         this.toggleCurrentFormType();
@@ -134,22 +154,22 @@ export default {
         const responseData = await response.json();
 
         if (!response.ok) {
-          console.log(responseData);
+          // console.log(responseData);
           throw new Error(responseData.error.message || 'An error has occurred');
 
         } else {
-          // если такая почта уже есть, нужно в компонент email кидать эту ошибку 
           const { idToken, expiresIn, localId } = responseData;
           this.authData = { idToken, expiresIn, localId };
 
           sessionStorage.setItem('userId', localId);
           sessionStorage.setItem('token', idToken);
 
-          this.isLoading = false;
           this.redirectToCountriesList();
         }
       } catch (error) {
-        console.log(error);
+        this.fetchError = error;
+        this.isLoading = false;
+        // console.log(error);
       }
 
 
